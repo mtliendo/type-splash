@@ -3,6 +3,7 @@ import { isTypingAttempt, normalizeTypedKey } from "@/lib/drills";
 import type { GhostRun, KeystrokeEvent } from "@/lib/types";
 import { RaceAudio } from "../audio";
 import { KeyboardHint } from "../entities/KeyboardHint";
+import { LetterTile } from "../entities/LetterTile";
 import { PoolWorld } from "../entities/Pool";
 import { GHOST_STYLE, Swimmer, XAVIER_STYLE } from "../entities/Swimmer";
 import type { GameHooks, SerializedDrill } from "../types";
@@ -21,7 +22,7 @@ export class RaceScene extends Phaser.Scene {
   private ghosts: GhostRacer[] = [];
   private keyboard!: KeyboardHint;
   private audio = new RaceAudio();
-  private letterText!: Phaser.GameObjects.Text;
+  private letterTile!: LetterTile;
   private timerText!: Phaser.GameObjects.Text;
   private progressText!: Phaser.GameObjects.Text;
   private bannerText!: Phaser.GameObjects.Text;
@@ -56,29 +57,14 @@ export class RaceScene extends Phaser.Scene {
       this.pool.startX - 28,
       this.pool.laneYs[xavierLane]!,
       { ...XAVIER_STYLE, label: "Xavier" },
-    );
-    this.add
-      .text(this.pool.startX - 28, this.pool.laneYs[xavierLane]! - 58, "YOU", {
-        fontFamily: "Fredoka, sans-serif",
-        fontSize: "12px",
-        color: "#14532d",
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5);
+    ).setTag("YOU", "#14532d");
 
     this.hooks.ghosts.slice(0, 3).forEach((ghost, i) => {
       const lane = ghostLanes[i] ?? 0;
       const swimmer = new Swimmer(this, this.pool.startX - 28, this.pool.laneYs[lane]!, {
         ...GHOST_STYLE,
         label: `Ghost ${i + 1}`,
-      });
-      this.add
-        .text(this.pool.startX - 28, this.pool.laneYs[lane]! - 58, `PB #${i + 1}`, {
-          fontFamily: "Fredoka, sans-serif",
-          fontSize: "11px",
-          color: "#1e3a8a",
-        })
-        .setOrigin(0.5);
+      }).setTag(`PB #${i + 1}`, "#312e81");
       this.ghosts.push({
         swimmer,
         times: correctTimes(ghost),
@@ -87,18 +73,7 @@ export class RaceScene extends Phaser.Scene {
     });
 
     this.keyboard = new KeyboardHint(this, width, height);
-    this.letterText = this.add
-      .text(width / 2, 168, "", {
-        fontFamily: "Fredoka, Nunito, sans-serif",
-        fontSize: "96px",
-        color: "#fefce8",
-        fontStyle: "bold",
-        stroke: "#0f172a",
-        strokeThickness: 8,
-      })
-      .setOrigin(0.5)
-      .setDepth(20)
-      .setAlpha(0);
+    this.letterTile = new LetterTile(this, this.pool.startX + 90, this.pool.laneYs[xavierLane]! - 78);
 
     this.timerText = this.add
       .text(width - 56, 42, "0:00.00", {
@@ -161,6 +136,10 @@ export class RaceScene extends Phaser.Scene {
   }
 
   update() {
+    this.letterTile.place(
+      Phaser.Math.Clamp(this.xavier.x + 72, 260, this.scale.width - 220),
+      this.pool.laneYs[1]! - 78,
+    );
     if (!this.racing || this.finished) return;
     this.elapsedMs = performance.now() - this.startedAt;
     this.timerText.setText(formatClock(this.elapsedMs));
@@ -235,7 +214,15 @@ export class RaceScene extends Phaser.Scene {
     this.attempts = this.drill.raceMeters + 2;
     this.elapsedMs = 18420;
     this.xavier.x = this.pool.xForMeter(this.meter, this.drill.raceMeters);
+    this.xavier.y = this.pool.laneYs[1]!;
     this.xavier.playSwim();
+    this.ghosts.forEach((ghost, i) => {
+      const lane = [0, 2, 3][i] ?? 0;
+      ghost.meter = Math.max(18, 22 - i);
+      ghost.swimmer.x = this.pool.xForMeter(ghost.meter, this.drill.raceMeters);
+      ghost.swimmer.y = this.pool.laneYs[lane]!;
+      ghost.swimmer.playSwim();
+    });
     this.finishRace();
   }
 
@@ -246,15 +233,7 @@ export class RaceScene extends Phaser.Scene {
       next = alphabet[Math.floor(Math.random() * alphabet.length)]!;
     }
     this.target = next;
-    this.letterText.setText(next === ";" ? ";" : next.toUpperCase());
-    this.letterText.setAlpha(1);
-    this.letterText.setScale(0.6);
-    this.tweens.add({
-      targets: this.letterText,
-      scale: 1,
-      duration: 180,
-      ease: "Back.out",
-    });
+    this.letterTile.show(next);
     this.keyboard.highlightLetter(next);
     this.hooks.onLetter?.(next);
   }
@@ -280,6 +259,8 @@ export class RaceScene extends Phaser.Scene {
       this.correct += 1;
       this.meter += 1;
       this.audio.splash();
+      this.letterTile.pop();
+      this.cameras.main.shake(70, 0.0035);
       this.progressText.setText(`${this.meter} / ${this.drill.raceMeters} m`);
       const dest = this.pool.xForMeter(this.meter, this.drill.raceMeters);
       this.xavier.strokeTo(dest);
@@ -290,6 +271,7 @@ export class RaceScene extends Phaser.Scene {
       this.nextLetter();
     } else {
       this.audio.bonk();
+      this.letterTile.wobble();
       this.xavier.bonkBubble();
     }
   }
@@ -311,9 +293,12 @@ export class RaceScene extends Phaser.Scene {
     this.finished = true;
     this.racing = false;
     this.elapsedMs = this.elapsedMs || performance.now() - this.startedAt;
-    this.letterText.setText("");
+    this.progressText.setText(`${this.drill.raceMeters} / ${this.drill.raceMeters} m`);
+    this.letterTile.hide();
     this.bannerText.setText("Finish!");
     this.xavier.celebrate();
+    this.finishWallSplash();
+    this.cameras.main.shake(160, 0.006);
     this.audio.cheer();
     this.burstConfetti();
 
@@ -331,23 +316,48 @@ export class RaceScene extends Phaser.Scene {
     });
   }
 
+  private finishWallSplash() {
+    const x = this.pool.finishX + 20;
+    const y = this.pool.laneYs[1]!;
+    for (let i = 0; i < 28; i++) {
+      const drop = this.add.ellipse(
+        x,
+        y,
+        Phaser.Math.Between(8, 18),
+        Phaser.Math.Between(5, 12),
+        Phaser.Utils.Array.GetRandom([0xffffff, 0xe0f2fe, 0x7dd3fc]),
+        0.95,
+      );
+      drop.setDepth(14);
+      this.tweens.add({
+        targets: drop,
+        x: x + Phaser.Math.Between(-80, 30),
+        y: y + Phaser.Math.Between(-70, 40),
+        alpha: 0,
+        duration: 420 + Math.random() * 280,
+        onComplete: () => drop.destroy(),
+      });
+    }
+  }
+
   private burstConfetti() {
     const { width } = this.scale;
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 56; i++) {
       const bit = this.add.rectangle(
-        width / 2 + Phaser.Math.Between(-80, 80),
-        200,
-        8,
-        14,
-        Phaser.Utils.Array.GetRandom([0xfacc15, 0x4ade80, 0x38bdf8, 0xfb7185, 0xf97316]),
+        width / 2 + Phaser.Math.Between(-100, 100),
+        170,
+        Phaser.Math.Between(8, 14),
+        Phaser.Math.Between(10, 18),
+        Phaser.Utils.Array.GetRandom([0xfacc15, 0x4ade80, 0x38bdf8, 0xfb7185, 0xf97316, 0xfde68a]),
       );
+      bit.setDepth(28);
       this.tweens.add({
         targets: bit,
-        x: bit.x + Phaser.Math.Between(-220, 220),
-        y: 640,
-        angle: Phaser.Math.Between(-240, 240),
+        x: bit.x + Phaser.Math.Between(-240, 240),
+        y: 660,
+        angle: Phaser.Math.Between(-280, 280),
         alpha: 0,
-        duration: 1200 + Math.random() * 700,
+        duration: 1100 + Math.random() * 800,
       });
     }
   }

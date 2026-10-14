@@ -30,8 +30,10 @@ export interface SwimmerStyle {
   hair: number;
   cap: number;
   capStripe: number;
+  goggles: number;
   suitDark: number;
   suitMid: number;
   suitGreen: number;
+  glow: number;
   label: string;
 }

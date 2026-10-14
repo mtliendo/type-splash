@@ -21,7 +21,7 @@ export function showEndScreen(
 
   host.innerHTML = `
     <div class="end-card">
-      <p class="end-kicker">Race complete</p>
+      <p class="end-kicker">Splash! · race complete</p>
       <h2>${result.personalBest ? "New personal best!" : "Nice swim!"}</h2>
       ${
         result.personalBest
