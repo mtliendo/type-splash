@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Type Splash — 25m home-row freestyle</title>
+    <meta name="description" content="Xavier's 25-meter home-row swim race." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body class="play-body">
+    <main id="gate" class="desktop-gate" hidden>
+      <h1>Grab a laptop</h1>
+      <p>
+        Type Splash is a two-hand home-row race. It needs a physical keyboard on a laptop or
+        desktop — no touch, no phones.
+      </p>
+      <a class="btn-secondary" href="/">Back home</a>
+    </main>
+
+    <main id="app" class="play-shell" hidden>
+      <header class="play-bar">
+        <a href="/" class="wordmark">Type Splash</a>
+        <p id="play-meta" class="play-meta">25m Home-Row Freestyle</p>
+        <div class="play-actions">
+          <button type="button" id="mute-btn" class="ghost-btn">Sound on</button>
+          <button type="button" id="logout-btn" class="ghost-btn">Sign out</button>
+        </div>
+      </header>
+      <div id="game" class="game-frame">Filling the pool…</div>
+    </main>
+
+    <div id="end" class="end-screen" hidden></div>
+    <script type="module" src="/src/play.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Type Splash — home-row swim races for kids</title>
+    <meta
+      name="description"
+      content="A splashy 25-meter typing race that helps kids learn two-hand home-row. Parents sign in. Kids race their own ghosts."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="home">
+      <div class="bubbles" aria-hidden="true">
+        <span style="left: 6%; animation-delay: 0s"></span>
+        <span style="left: 13%; animation-delay: 0.35s"></span>
+        <span style="left: 20%; animation-delay: 0.7s"></span>
+        <span style="left: 27%; animation-delay: 1.05s"></span>
+        <span style="left: 34%; animation-delay: 1.4s"></span>
+        <span style="left: 41%; animation-delay: 1.75s"></span>
+        <span style="left: 48%; animation-delay: 2.1s"></span>
+        <span style="left: 55%; animation-delay: 2.45s"></span>
+        <span style="left: 62%; animation-delay: 2.8s"></span>
+        <span style="left: 69%; animation-delay: 3.15s"></span>
+        <span style="left: 76%; animation-delay: 3.5s"></span>
+        <span style="left: 83%; animation-delay: 3.85s"></span>
+        <span style="left: 90%; animation-delay: 4.2s"></span>
+        <span style="left: 97%; animation-delay: 4.55s"></span>
+      </div>
+      <header class="home-nav">
+        <span class="wordmark">Type Splash</span>
+        <button type="button" class="btn-primary js-auth-cta" data-size="md">Parent sign in</button>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">For Xavier · two hands on the home row</p>
+          <h1>
+            Dive in.<br />
+            Type the letter.<br />
+            Race your ghosts.
+          </h1>
+          <p class="lede">
+            Type Splash is a bright 25-meter freestyle for kids learning home-row typing. One big
+            letter at a time. No next-letter peeking. Correct keys swim him forward. Misses just
+            make a bubbly bonk.
+          </p>
+          <div class="hero-cta">
+            <button type="button" class="btn-primary lg js-auth-cta" data-size="lg">
+              Parent sign in
+            </button>
+            <p>Laptop or desktop with a real keyboard. No phones, no touch.</p>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 420 360" class="hero-svg">
+            <defs>
+              <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7dd3fc" />
+                <stop offset="100%" stop-color="#0284c7" />
+              </linearGradient>
+            </defs>
+            <rect x="18" y="40" width="384" height="280" rx="32" fill="url(#water)" />
+            <ellipse cx="110" cy="120" rx="50" ry="10" fill="#fff" opacity="0.18" />
+            <ellipse cx="280" cy="200" rx="70" ry="12" fill="#fff" opacity="0.12" />
+            <g transform="translate(150 150)">
+              <ellipse cx="40" cy="70" rx="46" ry="14" fill="#e0f2fe" opacity="0.5" />
+              <ellipse cx="18" cy="48" rx="10" ry="18" fill="#d4a06a" />
+              <ellipse cx="58" cy="50" rx="10" ry="18" fill="#d4a06a" />
+              <ellipse cx="38" cy="28" rx="22" ry="24" fill="#4b5563" />
+              <ellipse cx="30" cy="26" rx="8" ry="12" fill="#1f2937" />
+              <ellipse cx="46" cy="32" rx="7" ry="9" fill="#22c55e" />
+              <circle cx="38" cy="4" r="16" fill="#d4a06a" />
+              <ellipse cx="38" cy="-2" rx="17" ry="10" fill="#141414" />
+              <rect x="26" y="-6" width="24" height="4" rx="2" fill="#4ade80" />
+              <circle cx="32" cy="4" r="2.2" fill="#2a1b12" />
+              <circle cx="44" cy="4" r="2.2" fill="#2a1b12" />
+            </g>
+            <text
+              x="210"
+              y="300"
+              text-anchor="middle"
+              fill="#082f49"
+              font-size="22"
+              font-family="Fredoka, sans-serif"
+            >
+              25m home-row freestyle
+            </text>
+          </svg>
+        </div>
+      </section>
+
+      <section class="features" id="features">
+        <h2>How the race works</h2>
+        <ul>
+          <li>
+            <strong>On your marks… get set… BEEP!</strong>
+            Xavier dives in. The clock starts at the beep and stops on the 25th correct letter.
+          </li>
+          <li>
+            <strong>One letter, no peeking.</strong>
+            A random home-row key — a s d f j k l ; — fills the pool. There is no next-letter preview.
+          </li>
+          <li>
+            <strong>Swim or bonk.</strong>
+            The right key moves him one meter. A wrong key pops a gentle bubble. No extra penalties.
+            The timer keeps running.
+          </li>
+          <li>
+            <strong>Hands and fingers.</strong>
+            The on-screen keyboard lights the target key and names the hand and finger. F and J show
+            the home-row bumps.
+          </li>
+          <li>
+            <strong>Ghost lanes.</strong>
+            First race is a solo time trial. After that, up to three of his fastest swims replay
+            beside him from the timestamp of each correct key.
+          </li>
+          <li>
+            <strong>Medals and PBs.</strong>
+            Beat a ghost and earn a medal. Beat himself and the pool throws confetti for a new
+            personal best.
+          </li>
+        </ul>
+      </section>
+
+      <section class="parents">
+        <div>
+          <h2>Parents sign in. Kids just swim.</h2>
+          <p>
+            Focus signs in with Auth0. Xavier plays on that account — no extra kid login, no scores
+            shared with anyone else. Each run is saved so tomorrow's ghosts are today's best times.
+          </p>
+        </div>
+        <button type="button" class="btn-primary lg js-auth-cta" data-size="lg">Parent sign in</button>
+      </section>
+
+      <footer class="home-foot">
+        <p>Type Splash · built for Xavier · laptop keyboard only</p>
+      </footer>
+    </div>
+    <script type="module" src="/src/home.ts"></script>
+  </body>
+</html>

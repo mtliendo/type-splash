@@ -23,12 +23,16 @@ Letter-set drills and word mode are **not** built yet. The drill lives in `lib/d
 
 | Piece | Choice |
 | --- | --- |
-| App | Next.js App Router, TypeScript, Tailwind CSS 4 |
+| App | Vite multi-page (vanilla TypeScript, no React) |
 | Game | Phaser 3 (`phaser@3.90`) |
+| Styles | Tailwind CSS 4 via `@tailwindcss/vite` |
 | Data | Drizzle ORM + Neon Postgres |
-| Auth | Auth0 Regular Web App via `@auth0/nextjs-auth0` v4 |
+| Auth | Auth0 Single Page Application via `@auth0/auth0-spa-js` |
+| API | Vercel Functions in `/api` (TypeScript, Node) + `jose` JWKS |
 | Host | Vercel project `type-splash` |
 | Package manager | pnpm |
+
+This used to be Next.js + React. Phaser never booted cleanly through Next's client-component / `next/dynamic` layer, so the race now mounts from a plain Vite page.
 
 ## Game rules
 
@@ -60,12 +64,14 @@ Need **Node 20+**, **pnpm**, and the env vars in `.env.example`.
 ```bash
 pnpm install
 cp .env.example .env.local
-# fill DATABASE_URL, Auth0 values, and AUTH0_SECRET (openssl rand -hex 32)
+# fill DATABASE_URL plus Auth0 SPA / API values
 pnpm db:migrate
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). **Parent sign in** goes to Auth0, then `/play`.
+Open [http://localhost:5173](http://localhost:5173). **Parent sign in** sends the parent through Auth0, then `/play`.
+
+`pnpm dev` also serves `/api/runs` with the same handlers as Vercel Functions, so ghosts persist locally when `DATABASE_URL` is set.
 
 ### Auth stub (no Universal Login)
 
@@ -73,10 +79,10 @@ For local play and screenshots without signing in:
 
 ```bash
 AUTH_STUB=1
-NEXT_PUBLIC_AUTH_STUB=1
+VITE_AUTH_STUB=1
 ```
 
-`/play` then uses a fixed stub user (`stub|xavier-local`). Do **not** set these on Vercel.
+`/play` then uses a fixed stub user (`stub|xavier-local`) and the API skips JWT checks. Do **not** set these on Vercel.
 
 Debug query params (optional, for capturing specific frames):
 
@@ -88,21 +94,25 @@ Debug query params (optional, for capturing specific frames):
 
 | Name | Where | Notes |
 | --- | --- | --- |
-| `DATABASE_URL` | Neon pooled (`-pooler`) | App queries |
+| `DATABASE_URL` | Neon pooled (`-pooler`) | Function queries |
 | `DATABASE_URL_UNPOOLED` | Neon direct | Drizzle migrations |
-| `AUTH0_DOMAIN` | Auth0 tenant host, no `https://` | tenant host only, no scheme |
-| `AUTH0_CLIENT_ID` | Type Splash Regular Web App | Not the CLI M2M client |
-| `AUTH0_CLIENT_SECRET` | Same app | Never commit |
-| `AUTH0_SECRET` | Random 32+ byte hex | Session cookie encryption |
-| `APP_BASE_URL` | App origin | `http://localhost:3000` locally, `https://type-splash.vercel.app` in production |
+| `VITE_AUTH0_DOMAIN` | Auth0 tenant host, no `https://` | Public, baked into the Vite bundle |
+| `VITE_AUTH0_CLIENT_ID` | Type Splash **SPA** application | Public |
+| `VITE_AUTH0_AUDIENCE` | Auth0 API identifier | `https://type-splash.vercel.app/api` |
+| `AUTH0_DOMAIN` | Same tenant host | Used by `/api/runs` to fetch JWKS |
+| `AUTH0_AUDIENCE` | Same API identifier | JWT `aud` check |
+| `AUTH0_ISSUER` | `https://<tenant>/` | Optional; defaults from `AUTH0_DOMAIN` |
 
-Auth0 application URLs:
+Auth0 application URLs (SPA, no client secret):
 
-- Callbacks: `http://localhost:3000/auth/callback`, `https://type-splash.vercel.app/auth/callback`, `https://*.vercel.app/auth/callback`
-- Logout URLs: `http://localhost:3000`, `https://type-splash.vercel.app`, `https://*.vercel.app`
+- Callbacks: `http://localhost:5173/play`, `https://type-splash.vercel.app/play`, `https://*.vercel.app/play`
+- Logout URLs: `http://localhost:5173`, `https://type-splash.vercel.app`, `https://*.vercel.app`
 - Web origins: the same three origins
+- Allowed origins CORS: the same three origins
 
-v4 mounts `/auth/login`, `/auth/logout`, and `/auth/callback` from `proxy.ts`.
+Auth0 API (audience): `https://type-splash.vercel.app/api` — used so `/api/runs` can verify access tokens.
+
+Removed Next.js-only secrets: `AUTH0_CLIENT_SECRET`, `AUTH0_SECRET`, `APP_BASE_URL`, `NEXT_PUBLIC_*`.
 
 ## Database
 
@@ -136,32 +146,37 @@ Do not add those modes until someone asks.
 
 ## Sound credits
 
-No third-party samples. The starting horn, stroke splashes, bubble bonk, and finish cheer are synthesized in `game/audio.ts` with the Web Audio API.
+No third-party samples. The starting horn, stroke splashes, bubble bonk, and finish cheer are synthesized in `src/game/audio.ts` with the Web Audio API.
 
 ## Project layout
 
 ```
-app/                homepage, /play, /api/runs
-lib/                Auth0, Drizzle, drills, run queries
-game/               Phaser race, swimmer, pool, keyboard, audio
-components/         PlayClient, EndScreen, GameMount
+index.html          marketing homepage
+play.html           Phaser race (login required)
+src/home.ts         homepage Auth0 CTAs
+src/play.ts         boot auth, ghosts, Phaser, end screen
+src/game/           Phaser race, swimmer, pool, keyboard, audio
+src/auth.ts         Auth0 SPA client + local stub
+api/runs.ts         Vercel Function: GET ghosts, POST a run
+lib/                Drizzle schema, queries, drill config, JWT verify
 drizzle/            SQL migrations
-proxy.ts            Auth0 routes + /play protection
+vite.config.ts      MPA build + local /api/runs middleware
+vercel.json         /play → /play.html
 ```
 
 ## Scripts
 
 | Script | What it does |
 | --- | --- |
-| `pnpm dev` | Next.js dev server |
-| `pnpm build` | Production build |
-| `pnpm lint` | ESLint |
+| `pnpm dev` | Vite on port 5173 + local `/api/runs` |
+| `pnpm build` | `tsc --noEmit` then production Vite build |
+| `pnpm preview` | Serve the production bundle |
 | `pnpm db:migrate` | Apply Drizzle migrations |
 
 No automated tests by design.
 
 ## Deploy
 
-Vercel project **type-splash** in team **focus-otters-projects**, git-linked to `mtliendo/type-splash`, production branch `main`, production domains auto-assigned.
+Vercel project **type-splash** in team **focus-otters-projects**, git-linked to `mtliendo/type-splash`, production branch `main`, production domains auto-assigned, framework preset **Vite**.
 
 Preview deployments should load `/` for anyone and send `/play` to Auth0 login.
