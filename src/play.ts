@@ -73,7 +73,7 @@ async function boot() {
   } catch {
     ghosts = [];
   }
-  if (ghosts.length === 0 && (phase === "race" || phase === "finish")) {
+  if (ghosts.length === 0 && (phase === "race" || phase === "finish" || phase === "countdown")) {
     ghosts = demoGhosts(DEFAULT_DRILL.raceMeters);
   }
 

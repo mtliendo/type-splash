@@ -154,7 +154,12 @@ export class RaceScene extends Phaser.Scene {
   }
 
   private async runCountdown() {
-    const hold = this.hooks.debugPhase === "countdown" ? 2200 : 1100;
+    if (this.hooks.debugPhase === "countdown") {
+      this.bannerText.setText("On your marks…");
+      this.bannerText.setScale(1);
+      return;
+    }
+    const hold = 1100;
     await this.say("On your marks…", hold);
     await this.say("get set…", hold);
     this.audio.unlock();
