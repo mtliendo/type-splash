@@ -4,7 +4,7 @@ import type { GameHooks } from "./types";
 
 export function createTypeSplashGame(hooks: GameHooks) {
   const game = new Phaser.Game({
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     parent: hooks.parent,
     width: 1280,
     height: 720,
@@ -19,11 +19,11 @@ export function createTypeSplashGame(hooks: GameHooks) {
       mouse: false,
       touch: false,
     },
-    scene: [RaceScene],
+    scene: [],
     audio: { noAudio: true },
     banner: false,
   });
 
-  game.scene.start("race", hooks);
+  game.scene.add("race", RaceScene, true, hooks);
   return game;
 }

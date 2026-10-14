@@ -7,12 +7,22 @@ import { getFastestRuns, getPersonalBestMs } from "@/lib/runs";
 
 export const instant = false;
 
-export default async function PlayPage() {
+export default async function PlayPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ phase?: string }>;
+}) {
   await connection();
   const user = await getCurrentUser();
   if (!user) {
     redirect("/auth/login?returnTo=/play");
   }
+
+  const params = await searchParams;
+  const debugPhase =
+    params.phase === "countdown" || params.phase === "race" || params.phase === "finish"
+      ? params.phase
+      : null;
 
   const drill = DEFAULT_DRILL;
   let ghosts: Awaited<ReturnType<typeof getFastestRuns>> = [];
@@ -36,6 +46,7 @@ export default async function PlayPage() {
       ghosts={ghosts}
       previousBestMs={previousBestMs}
       stub={isAuthStub()}
+      debugPhase={debugPhase}
     />
   );
 }

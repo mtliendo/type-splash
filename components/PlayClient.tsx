@@ -2,13 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { EndScreen } from "@/components/EndScreen";
-
-const GameMount = dynamic(() => import("@/components/GameMount"), {
-  ssr: false,
-  loading: () => <div className="game-frame">Loading the pool…</div>,
-});
+import GameMount from "@/components/GameMount";
 import type { SerializedDrill } from "@/game/types";
 import type { GhostRun, RaceResult } from "@/lib/types";
 
@@ -42,11 +37,13 @@ export function PlayClient({
   ghosts,
   previousBestMs,
   stub,
+  debugPhase = null,
 }: {
   drill: SerializedDrill;
   ghosts: GhostRun[];
   previousBestMs: number | null;
   stub: boolean;
+  debugPhase?: "countdown" | "race" | "finish" | null;
 }) {
   const [desktop, setDesktop] = useState(true);
   const [muted, setMuted] = useState(false);
@@ -54,13 +51,6 @@ export function PlayClient({
   const [result, setResult] = useState<RaceResult | null>(null);
   const [ghostBoard, setGhostBoard] = useState(ghosts);
   const [bestMs, setBestMs] = useState(previousBestMs);
-
-  const debugPhase = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    const value = new URLSearchParams(window.location.search).get("phase");
-    if (value === "countdown" || value === "race" || value === "finish") return value;
-    return null;
-  }, []);
 
   const raceGhosts = useMemo(() => {
     if (ghostBoard.length > 0) return ghostBoard;

@@ -221,8 +221,10 @@ a {
 
 .game-frame {
   flex: 1;
-  min-height: 0;
+  min-height: 720px;
+  width: 100%;
   background: #ffedd5;
+  position: relative;
 }
 
 .game-frame canvas {
