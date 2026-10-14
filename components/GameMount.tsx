@@ -37,17 +37,24 @@ export function GameMount({
     let destroyed = false;
     let game: { destroy: (removeCanvas: boolean) => void } | null = null;
 
-    void import("@/game/createGame").then(({ createTypeSplashGame }) => {
-      if (destroyed || !parentRef.current) return;
-      game = createTypeSplashGame({
-        parent: parentRef.current,
-        drill,
-        ghosts,
-        debugPhase,
-        onFinish: (payload) => finishRef.current(payload),
+    void import("@/game/createGame")
+      .then(({ createTypeSplashGame }) => {
+        if (destroyed || !parentRef.current) return;
+        game = createTypeSplashGame({
+          parent: parentRef.current,
+          drill,
+          ghosts,
+          debugPhase,
+          onFinish: (payload) => finishRef.current(payload),
+        });
+        window.dispatchEvent(new CustomEvent("type-splash-mute", { detail: { muted } }));
+      })
+      .catch((error: unknown) => {
+        console.error("Type Splash failed to start", error);
+        if (parent) {
+          parent.textContent = "The pool could not load. Refresh, or check the browser console.";
+        }
       });
-      window.dispatchEvent(new CustomEvent("type-splash-mute", { detail: { muted } }));
-    });
 
     return () => {
       destroyed = true;
@@ -64,3 +71,5 @@ export function GameMount({
 
   return <div ref={parentRef} className="game-frame" data-muted={muted ? "1" : "0"} />;
 }
+
+export default GameMount;

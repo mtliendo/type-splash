@@ -5,9 +5,9 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { EndScreen } from "@/components/EndScreen";
 
-const GameMount = dynamic(() => import("@/components/GameMount").then((mod) => mod.GameMount), {
+const GameMount = dynamic(() => import("@/components/GameMount"), {
   ssr: false,
-  loading: () => <div className="game-frame" aria-label="Loading the pool" />,
+  loading: () => <div className="game-frame">Loading the pool…</div>,
 });
 import type { SerializedDrill } from "@/game/types";
 import type { GhostRun, RaceResult } from "@/lib/types";
