@@ -30,7 +30,7 @@ export class PoolWorld {
 
   private drawDeck(width: number, height: number) {
     const g = this.scene.add.graphics();
-    g.fillGradientStyle(0xffedd5, 0xfdba74, 0xf97316, 0xea580c, 1);
+    g.fillGradientStyle(0x38bdf8, 0x0ea5e9, 0xfdba74, 0xf97316, 1);
     g.fillRect(0, 0, width, height);
 
     const tile = 18;
@@ -61,8 +61,8 @@ export class PoolWorld {
   private drawWater(width: number) {
     const waterH = this.waterBottom - this.waterTop;
     const g = this.scene.add.graphics();
-    g.fillGradientStyle(0x7dd3fc, 0x38bdf8, 0x0284c7, 0x0c4a6e, 1);
-    g.fillRoundedRect(40, this.waterTop, width - 80, waterH, 18);
+    g.fillGradientStyle(0x38bdf8, 0x0ea5e9, 0x0369a1, 0x0c4a6e, 1);
+    g.fillRoundedRect(28, this.waterTop, width - 56, waterH, 18);
 
     for (let i = 0; i < 22; i++) {
       const shimmer = this.scene.add.ellipse(

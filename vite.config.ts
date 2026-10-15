@@ -45,7 +45,7 @@ async function dispatchRuns(
   req: import("http").IncomingMessage,
   res: import("http").ServerResponse,
 ) {
-  const mod = (await server.ssrLoadModule("/api/runs.ts")) as {
+  const mod = (await server.ssrLoadModule("/server/runs-api.ts")) as {
     GET: (request: Request) => Promise<Response>;
     POST: (request: Request) => Promise<Response>;
   };

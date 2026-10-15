@@ -37,6 +37,10 @@ export function getAuth0Client() {
   return clientPromise;
 }
 
+function audience() {
+  return import.meta.env.VITE_AUTH0_AUDIENCE ?? "";
+}
+
 export async function loginToPlay() {
   if (isAuthStub()) {
     window.location.assign("/play");
@@ -45,7 +49,11 @@ export async function loginToPlay() {
   const client = await getAuth0Client();
   await client.loginWithRedirect({
     appState: { returnTo: "/play" },
-    authorizationParams: { redirect_uri: playUrl() },
+    authorizationParams: {
+      redirect_uri: playUrl(),
+      audience: audience(),
+      scope: "openid profile email",
+    },
   });
 }
 
@@ -75,7 +83,11 @@ export async function requirePlaySession(): Promise<{ stub: boolean }> {
   if (!signedIn) {
     await client.loginWithRedirect({
       appState: { returnTo: "/play" },
-      authorizationParams: { redirect_uri: playUrl() },
+      authorizationParams: {
+        redirect_uri: playUrl(),
+        audience: audience(),
+        scope: "openid profile email",
+      },
     });
     return new Promise(() => undefined);
   }
@@ -99,5 +111,10 @@ export async function isSignedIn() {
 export async function getAccessToken() {
   if (isAuthStub()) return null;
   const client = await getAuth0Client();
-  return client.getTokenSilently();
+  return client.getTokenSilently({
+    authorizationParams: {
+      audience: audience(),
+      scope: "openid profile email",
+    },
+  });
 }

@@ -24,7 +24,7 @@ body {
 }
 
 .play-body {
-  background: #ffedd5;
+  background: #0369a1;
 }
 
 a {
@@ -228,7 +228,7 @@ a {
   flex: 1;
   min-height: 720px;
   width: 100%;
-  background: #ffedd5;
+  background: #0369a1;
   position: relative;
 }
 

@@ -1,7 +1,7 @@
 import { and, asc, eq } from "drizzle-orm";
-import { getDb } from "./db";
-import { runs } from "./schema";
-import type { GhostRun, KeystrokeEvent } from "./types";
+import { getDb } from "./db.js";
+import { runs } from "./schema.js";
+import type { GhostRun, KeystrokeEvent } from "./types.js";
 
 export async function getFastestRuns(
   userSub: string,

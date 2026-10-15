@@ -110,7 +110,7 @@ Auth0 application URLs (SPA, no client secret):
 - Web origins: the same three origins
 - Allowed origins CORS: the same three origins
 
-Auth0 API (audience): `https://type-splash.vercel.app/api` — used so `/api/runs` can verify access tokens.
+Auth0 API (audience): `https://type-splash.vercel.app/api` — used so `/api/runs` can verify access tokens. The SPA and any machine client that calls the API must be authorized for that audience. `getTokenSilently` always requests it.
 
 Removed Next.js-only secrets: `AUTH0_CLIENT_SECRET`, `AUTH0_SECRET`, `APP_BASE_URL`, `NEXT_PUBLIC_*`.
 
@@ -157,7 +157,8 @@ src/home.ts         homepage Auth0 CTAs
 src/play.ts         boot auth, ghosts, Phaser, end screen
 src/game/           Phaser race, swimmer, pool, keyboard, audio
 src/auth.ts         Auth0 SPA client + local stub
-api/runs.ts         Vercel Function: GET ghosts, POST a run
+server/runs-api.ts  GET ghosts / POST a run (source)
+api/runs.js         bundled Vercel Function (esbuild, no relative ESM imports)
 lib/                Drizzle schema, queries, drill config, JWT verify
 drizzle/            SQL migrations
 vite.config.ts      MPA build + local /api/runs middleware

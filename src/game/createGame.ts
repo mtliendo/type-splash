@@ -8,7 +8,7 @@ export function createTypeSplashGame(hooks: GameHooks) {
     parent: hooks.parent,
     width: 1280,
     height: 720,
-    backgroundColor: "#ffedd5",
+    backgroundColor: "#0369a1",
     antialias: true,
     scale: {
       mode: Phaser.Scale.FIT,

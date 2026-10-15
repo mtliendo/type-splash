@@ -1,7 +1,7 @@
-import { getUserSub } from "../lib/auth";
-import { getDrill } from "../lib/drills";
-import { getFastestRuns, getPersonalBestMs, saveRun } from "../lib/runs";
-import type { KeystrokeEvent } from "../lib/types";
+import { getUserSub } from "../lib/auth.js";
+import { getDrill } from "../lib/drills.js";
+import { getFastestRuns, getPersonalBestMs, saveRun } from "../lib/runs.js";
+import type { KeystrokeEvent } from "../lib/types.js";
 
 export async function GET(request: Request) {
   return handle(request);
@@ -70,6 +70,7 @@ async function handle(request: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Server error";
+    console.error("[api/runs]", message);
     return Response.json({ error: message }, { status: 500 });
   }
 }

@@ -70,7 +70,8 @@ async function boot() {
     const board = await loadBoard(DEFAULT_DRILL.id);
     ghosts = board.ghosts;
     bestMs = board.personalBestMs;
-  } catch {
+  } catch (error) {
+    console.error("Could not load ghosts", error);
     ghosts = [];
   }
   if (ghosts.length === 0 && (phase === "race" || phase === "finish" || phase === "countdown")) {
@@ -128,8 +129,8 @@ async function boot() {
           ghosts = refreshed.ghosts;
           bestMs = refreshed.personalBestMs;
           updateMeta();
-        } catch {
-          // Keep the local result if the save fails; Xavier can still race again.
+        } catch (error) {
+          console.error("Could not save run", error);
         }
       },
     });
