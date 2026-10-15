@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/play", "destination": "/play.html" }
+  ],
+  "functions": {
+    "api/runs.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
