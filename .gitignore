@@ -30,3 +30,7 @@ yarn-error.log*
 # leftover Next cache if present
 /.next/
 /out/
+
+# generated sprite atlas (pnpm atlas / prebuild)
+/public/atlases/*
+!/public/atlases/.gitkeep

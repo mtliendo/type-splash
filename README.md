@@ -148,6 +148,58 @@ Do not add those modes until someone asks.
 
 No third-party samples. The starting horn, stroke splashes, bubble bonk, and finish cheer are synthesized in `src/game/audio.ts` with the Web Audio API.
 
+## Game tooling
+
+### Phaser agent skills
+
+Official Phaser skills live in `.cursor/skills/<name>/SKILL.md` so Cursor picks them up automatically.
+
+- **Source:** [phaserjs/phaser `skills/`](https://github.com/phaserjs/phaser/tree/master/skills)
+- **Copied from commit:** [`02d8931b626d9764c133cbb3fbf99966c03c757c`](https://github.com/phaserjs/phaser/commit/02d8931b626d9764c133cbb3fbf99966c03c757c) (Phaser **4.2.1** on `master`)
+- **This repo:** `phaser@3.90` — the skills target **Phaser 4**. Do not upgrade Phaser to match the skills. Treat v4-only APIs (`TilemapGPULayer`, Filters / RenderNodes, `v4-new-features`) as reference, not copy-paste. The `v3-to-v4-migration` skill is useful only if someone later decides to upgrade.
+
+Refresh (replace the tree, then update the SHA above):
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/phaserjs/phaser.git /tmp/phaser
+git -C /tmp/phaser sparse-checkout set skills
+git -C /tmp/phaser rev-parse HEAD
+rm -rf .cursor/skills
+mkdir -p .cursor/skills
+cp -a /tmp/phaser/skills/. .cursor/skills/
+```
+
+### Sprite atlas (Free Texture Packer)
+
+[`free-tex-packer-cli`](https://github.com/odrick/free-tex-packer-cli) (MIT) is a devDependency. Loose PNGs go in `assets/sprites-src/`. `pnpm atlas` writes a Phaser JSON-hash atlas (`sprites.png` + `sprites.json`, trim on, padding 2, extrude 1) to `public/atlases/`.
+
+Load it later with:
+
+```js
+this.load.atlas("sprites", "/atlases/sprites.png", "/atlases/sprites.json");
+this.add.image(x, y, "sprites", "frame-name.png");
+```
+
+The race currently draws everything with Phaser Graphics — there are no individual images to pack, so the atlas is not loaded yet.
+
+`prebuild` runs `pnpm atlas` so Vercel produces the sheet during `pnpm build` (devDependencies stay installed on Vercel). Generated files are gitignored. An empty `assets/sprites-src/` is a no-op (exit 0) so Preview/production builds do not fail before art exists. After dropping new PNGs, run `pnpm atlas` once for local `pnpm dev` (Vite does not run `prebuild`).
+
+### Tiled maps
+
+Author maps in [Tiled](https://www.mapeditor.org/) (free). Save JSON as `.tmj` under `maps/`, **embed tilesets**, and load with `this.load.tilemapTiledJSON`. Full steps: `maps/README.md`.
+
+The pool lanes stay Graphics, not a tilemap — gradients, shimmer tweens, and vector swimmers would not survive a clean conversion.
+
+### Art sources
+
+Game art, when we add it, comes from:
+
+- [Kenney](https://kenney.nl/assets) (CC0)
+- [itch.io game assets](https://itch.io/game-assets) (check each pack license)
+- [CraftPix](https://craftpix.net/) (free and paid 2D packs, commercial use allowed)
+
+Raw packs go in `assets/sprites-src/` and get packed with `pnpm atlas`. List each pack's source and license in `CREDITS.md`. Do not add or buy art unless someone asks.
+
 ## Project layout
 
 ```
@@ -161,6 +213,12 @@ server/runs-api.ts  GET ghosts / POST a run (source)
 api/runs.js         bundled Vercel Function (esbuild, no relative ESM imports)
 lib/                Drizzle schema, queries, drill config, JWT verify
 drizzle/            SQL migrations
+assets/sprites-src/ loose PNGs (Kenney / itch / CraftPix) before packing
+assets/sprites.ftpp Free Texture Packer CLI project template (padding 2, extrude 1, Phaser hash)
+public/atlases/     generated Phaser JSON-hash atlas
+maps/               Tiled JSON (.tmj) sources
+.cursor/skills/     Phaser official agent skills (Phaser 4, see above)
+CREDITS.md          art pack sources and licenses
 vite.config.ts      MPA build + local /api/runs middleware
 vercel.json         /play → /play.html
 ```
@@ -170,7 +228,8 @@ vercel.json         /play → /play.html
 | Script | What it does |
 | --- | --- |
 | `pnpm dev` | Vite on port 5173 + local `/api/runs` |
-| `pnpm build` | `tsc --noEmit` then production Vite build |
+| `pnpm atlas` | Pack `assets/sprites-src/` → `public/atlases/` |
+| `pnpm build` | `prebuild` (atlas) then `tsc --noEmit`, Vite, API bundle |
 | `pnpm preview` | Serve the production bundle |
 | `pnpm db:migrate` | Apply Drizzle migrations |
 
