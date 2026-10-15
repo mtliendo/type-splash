@@ -1,0 +1,25 @@
+{
+  "savePath": "public/atlases",
+  "images": [],
+  "folders": [],
+  "packOptions": {
+    "textureName": "sprites",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": true,
+    "padding": 2,
+    "extrude": 1,
+    "allowRotation": false,
+    "detectIdentical": true,
+    "allowTrim": true,
+    "trimMode": "trim",
+    "alphaThreshold": 0,
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "textureFormat": "png",
+    "exporter": "Phaser (hash)",
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}
